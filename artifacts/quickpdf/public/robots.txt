@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://quickpdf.cyberrudra.com/sitemap.xml
+
+# Disallow Clerk auth internal routes
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /dashboard

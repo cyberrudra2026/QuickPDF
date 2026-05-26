@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "nLBiCxNxnDTfYIYodKexL"
+uri = "file://artifacts/quickpdf/public/quickpdf-source.zip"
+type = "unspecified"
+title = "QuickPDF Source Code (ZIP)"
+
+[[outputs]]
+id = "TmKCkpzwmQ_rq14MogGtW"
+uri = "file://quickpdf-source.zip"
+type = "unspecified"
+title = "QuickPDF — Source Code (ZIP)"

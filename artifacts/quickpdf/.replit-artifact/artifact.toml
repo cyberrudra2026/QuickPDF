@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "QuickPDF"
+version = "1.0.0"
+id = "artifacts/quickpdf"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21442
+
+[services.development]
+run = "pnpm --filter @workspace/quickpdf run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/quickpdf", "run", "build" ]
+publicDir = "artifacts/quickpdf/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21442"
+BASE_PATH = "/"

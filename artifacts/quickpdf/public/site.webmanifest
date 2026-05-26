@@ -1,0 +1,12 @@
+{
+  "name": "QuickPDF – Free Online PDF Tools",
+  "short_name": "QuickPDF",
+  "description": "Merge, split, edit, sign, protect and unlock PDFs online. Free, fast and secure.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#C41E3A",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

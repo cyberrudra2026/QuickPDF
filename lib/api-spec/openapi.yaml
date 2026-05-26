@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: QuickPDF API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: files
+    description: PDF file history and management
+  - name: pdf
+    description: PDF processing operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /files:
+    get:
+      operationId: listFiles
+      tags: [files]
+      summary: List user's file history
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of processed files
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /files/{fileId}:
+    delete:
+      operationId: deleteFile
+      tags: [files]
+      summary: Delete a file record
+      security:
+        - clerkAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: File deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /files/stats:
+    get:
+      operationId: getFileStats
+      tags: [files]
+      summary: Get user file processing statistics
+      security:
+        - clerkAuth: []
+      responses:
+        "200":
+          description: File statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileStats"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /pdf/merge:
+    post:
+      operationId: mergePdf
+      tags: [pdf]
+      summary: Merge multiple PDFs into one
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [files]
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                outputName:
+                  type: string
+      responses:
+        "200":
+          description: Merged PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /pdf/split:
+    post:
+      operationId: splitPdf
+      tags: [pdf]
+      summary: Split a PDF into parts
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                mode:
+                  type: string
+                  enum: [range, pages]
+                  default: range
+                pageRanges:
+                  type: string
+                  description: "Comma-separated page ranges e.g. '1-3,5,7-9'"
+                pages:
+                  type: string
+                  description: "Comma-separated page numbers e.g. '1,3,5'"
+      responses:
+        "200":
+          description: Split PDF zip archive
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /pdf/protect:
+    post:
+      operationId: protectPdf
+      tags: [pdf]
+      summary: Password-protect a PDF
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, password]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                password:
+                  type: string
+                allowPrinting:
+                  type: boolean
+                  default: true
+                allowCopying:
+                  type: boolean
+                  default: true
+                allowEditing:
+                  type: boolean
+                  default: true
+      responses:
+        "200":
+          description: Protected PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /pdf/unlock:
+    post:
+      operationId: unlockPdf
+      tags: [pdf]
+      summary: Remove password from a PDF
+      security:
+        - clerkAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, password]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Unlocked PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    clerkAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    FileRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        operation:
+          type: string
+          enum: [merge, split, protect, unlock, edit, sign]
+        originalName:
+          type: string
+        outputName:
+          type: string
+        fileSizeBytes:
+          type: integer
+        status:
+          type: string
+          enum: [completed, failed]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - operation
+        - originalName
+        - outputName
+        - fileSizeBytes
+        - status
+        - createdAt
+
+    FileListResponse:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileRecord"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+      required:
+        - files
+        - total
+        - limit
+        - offset
+
+    FileStats:
+      type: object
+      properties:
+        totalFiles:
+          type: integer
+        byOperation:
+          type: object
+          additionalProperties:
+            type: integer
+        totalSizeBytes:
+          type: integer
+        recentFiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileRecord"
+      required:
+        - totalFiles
+        - byOperation
+        - totalSizeBytes
+        - recentFiles
