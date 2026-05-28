@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: quickpdf-api
+    env: node
+    buildCommand: npm install -g pnpm && pnpm install && pnpm --filter @workspace/db run push && pnpm --filter @workspace/api-server run build
+    startCommand: pnpm --filter @workspace/api-server run start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
