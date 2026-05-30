@@ -6,7 +6,7 @@ export const translations = {
   en: {
     // Navbar
     tools: "Tools",
-    signInSignUp: "Login / Signup",
+    signInSignUp: "Login",
     dashboard: "Dashboard",
     signOut: "Sign Out",
     // Hero
@@ -65,7 +65,7 @@ export const translations = {
   hi: {
     // Navbar
     tools: "टूल्स",
-    signInSignUp: "लॉगिन / साइनअप",
+    signInSignUp: "लॉगिन",
     dashboard: "डैशबोर्ड",
     signOut: "साइन आउट",
     // Hero
