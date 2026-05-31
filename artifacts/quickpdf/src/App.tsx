@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
-import { ClerkProvider, SignIn, SignUp, Show, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, SignUp, Show, useClerk, useAuth } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { Switch, Route, useLocation, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import { setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/hooks/use-language";
@@ -128,6 +129,20 @@ function ClerkQueryClientCacheInvalidator() {
   return null;
 }
 
+function ApiClientInitializer() {
+  const { getToken } = useAuth();
+  
+  useEffect(() => {
+    if (import.meta.env.PROD) {
+      const apiUrl = import.meta.env.VITE_API_URL || "https://quickpdf-4n5w.onrender.com";
+      setBaseUrl(apiUrl);
+      setAuthTokenGetter(() => getToken());
+    }
+  }, [getToken]);
+
+  return null;
+}
+
 function HomeRedirect() {
   return (
     <>
@@ -169,6 +184,7 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <ApiClientInitializer />
         <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
           <Navbar />
