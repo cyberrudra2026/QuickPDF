@@ -56,14 +56,15 @@ export default function ProtectPdf() {
       }
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('password', password);
-    formData.append('allowPrinting', permissions.printing.toString());
-    formData.append('allowCopying', permissions.copying.toString());
-    formData.append('allowEditing', permissions.editing.toString());
+    const data = {
+      file,
+      password,
+      allowPrinting: permissions.printing,
+      allowCopying: permissions.copying,
+      allowEditing: permissions.editing,
+    };
 
-    protectMutation.mutate({ data: formData as any }, {
+    protectMutation.mutate({ data }, {
       onSuccess: (blob) => {
         const url = URL.createObjectURL(blob as unknown as Blob);
         const a = document.createElement('a');

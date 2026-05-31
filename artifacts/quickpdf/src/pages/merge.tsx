@@ -71,11 +71,7 @@ export default function MergePdf() {
       }
     }
 
-    const formData = new FormData();
-    files.forEach(f => formData.append('files', f));
-    formData.append('outputName', 'merged_document.pdf');
-
-    mergeMutation.mutate({ data: formData as any }, {
+    mergeMutation.mutate({ data: { files, outputName: 'merged_document.pdf' } }, {
       onSuccess: (blob) => {
         const url = URL.createObjectURL(blob as unknown as Blob);
         const a = document.createElement('a');

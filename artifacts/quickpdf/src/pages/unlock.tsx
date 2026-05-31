@@ -54,11 +54,9 @@ export default function UnlockPdf() {
       }
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('password', password);
+    const data = { file, password };
 
-    unlockMutation.mutate({ data: formData as any }, {
+    unlockMutation.mutate({ data }, {
       onSuccess: (blob) => {
         const url = URL.createObjectURL(blob as unknown as Blob);
         const a = document.createElement('a');

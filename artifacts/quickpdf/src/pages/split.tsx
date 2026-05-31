@@ -60,13 +60,11 @@ export default function SplitPdf() {
       }
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('mode', mode);
-    if (mode === "range") formData.append('pageRanges', rangeInput);
-    if (mode === "pages") formData.append('pages', pagesInput);
+    const data: any = { file, mode };
+    if (mode === "range") data.pageRanges = rangeInput;
+    if (mode === "pages") data.pages = pagesInput;
 
-    splitMutation.mutate({ data: formData as any }, {
+    splitMutation.mutate({ data }, {
       onSuccess: (blob) => {
         const url = URL.createObjectURL(blob as unknown as Blob);
         const a = document.createElement('a');
